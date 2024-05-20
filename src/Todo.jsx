@@ -1,9 +1,17 @@
 import React, { useState } from 'react'
 import './style.css'
+import { useEffect } from 'react';
 
 const Todo = () => {
     const [task, setTask] = useState("")
     const [allTask, setAllTask] = useState([]);
+    const [editid,setEditId] = useState("");
+    const [single,setSingle] = useState("");
+
+    useEffect(()=>{
+        setTask(single.task)
+    },[single]);
+
     const hendelSubmit = (event) => {
         event.preventDefault();
         if(!task){
@@ -11,6 +19,7 @@ const Todo = () => {
             return false;
         }
         let exist = allTask.find((f => f.task==task))
+
     if(exist){
         alert("task already exist");
         return false;
@@ -20,12 +29,16 @@ const Todo = () => {
             task,
             status: "pending"
         }
+        if(editid){
+          
+          obj.userid = editid;
 
+        }else{         
         let NewRecord = ([...allTask, obj])
         setAllTask(NewRecord);
-        alert("task Add");
+        alert("task Add")
         setTask("")
-
+        }
     }
     const CompletTodo = (id) => {
         let UpdetR = allTask.map((item) => {
@@ -42,17 +55,37 @@ const Todo = () => {
         alert("Delet..")
     }
 
+    const EditR =(id) =>{
+        setSingle(allTask.find(val => val.userid == id))
+        setEditId(id);
+
+    }
+
+    const UpdateR = (d) =>{
+        let UpdetR = allTask.map((item) => {
+            if (item.userid == editid) {
+                item.task = d.task
+            }
+            return item;
+        })
+        setAllTask(UpdetR);
+        setEditId("")
+        alert("Updeted...")
+
+
+    }
+
     return (
         <div align="center" className='todo'>
-            <h1>To-Do</h1>
-            <form onSubmit={hendelSubmit} >
+            <h1>ToDo -list</h1>
+            <form onSubmit={hendelSubmit} className='p-4 w-100'>
               
-                Task : <input type="text" onChange={(e) => setTask(e.target.value)} value={task} />
-                <input type='submit' className='submit' />
+                Task : <input type="text" onChange={(e) => setTask(e.target.value)} value={task}  />
+                <input type='submit' className='submit ms-3 bg-success text-white' />
             </form>
 
-            <h1>List</h1>
-            <table className="table table-success table-striped " >
+            <h1 className='pt-3'>List</h1>
+            <table className="table table-primary table-striped" border={1}>
                 <thead>
                     <tr>
                         <th>Id</th>
@@ -73,6 +106,7 @@ const Todo = () => {
                                     <td>
                                         <button className='comp' disabled={status == "completed"} onClick={() => CompletTodo(userid)}>complete</button>
                                         <button onClick={() => DeletR(userid)}>Delet</button>
+                                        <button className='bg-primary' onClick={() => EditR(userid)}>Edit</button >
                                     </td>
                                 </tr>
                             )
